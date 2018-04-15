@@ -42,6 +42,24 @@ export default class Queue {
     return isRemoved;
   }
 
+  cancelByJobId(id: number) {
+    let isRemoved = false;
+    this.queue = this.queue.filter((job) => {
+      if (job.user) {
+        if (job.id !== id) {
+          return true;
+        } else {
+          isRemoved = true;
+          return false;
+        }
+      } else {
+        return true;
+      }
+    })
+
+    return isRemoved;
+  }
+
   isEnqueuedJobByUser(user: User):boolean {
     return this.queue.filter((job) => {
       if (!job.user) {

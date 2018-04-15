@@ -55,18 +55,27 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('cancel', () => {
+  socket.on('cancel', (id?: number) => {
     if (!loginedUser) return;
 
-    if (queue.cancel(loginedUser)) {
-      updateJobQueueHandler();
-      socket.emit('Canceled');
+    if (loginedUser.isAdmin) {
+      // admin
+      if (!id) return;
+      if (queue.cancelByJobId(id)) {
+        updateJobQueueHandler();
+      }
+    } else {
+      // not admin
+      if (queue.cancel(loginedUser)) {
+        updateJobQueueHandler();
+        socket.emit('Canceled');
+      }
     }
   })
 
   socket.on('Status', (inOpe: boolean) => {
-    updateStatusHandler();
     inOperation = inOpe;
+    updateStatusHandler();
   })
 });
 
