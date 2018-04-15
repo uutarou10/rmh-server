@@ -74,8 +74,10 @@ io.on('connection', (socket) => {
   })
 
   socket.on('Status', (inOpe: boolean) => {
-    inOperation = inOpe;
-    updateStatusHandler();
+    if (loginedUser && loginedUser.isAdmin) {
+      inOperation = inOpe;
+      updateStatusHandler();
+    }
   })
 });
 
