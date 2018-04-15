@@ -28,6 +28,7 @@ io.on('connection', (socket) => {
     const newUser = new User(name, socket.id, false);
     if (users.addUser(newUser)) {
       socket.emit('Joined', newUser);
+      loginedUser = newUser;
     }
   });
 
@@ -39,6 +40,7 @@ io.on('connection', (socket) => {
     const newUser = new User('Admin', socket.id, true);
     if(users.addUser(newUser)) {
       socket.emit('Joined', newUser);
+      loginedUser = newUser;
     }
 
     return;
@@ -49,9 +51,9 @@ io.on('connection', (socket) => {
     if (queue.enqueue(job)) {
       // successful enqueue
       updateJobQueueHandler();
-      socket.emit('ReceivedJob', new ReceivedJobMessage(true, job))
+      socket.emit('ReceivedJob', new ReceivedJobMessage(true, job));
     } else {
-      socket.emit('ReceivedJob', new ReceivedJobMessage(false, undefined))
+      socket.emit('ReceivedJob', new ReceivedJobMessage(false, undefined));
     }
   });
 
@@ -71,14 +73,22 @@ io.on('connection', (socket) => {
         socket.emit('Canceled');
       }
     }
-  })
+  });
 
   socket.on('Status', (inOpe: boolean) => {
     if (loginedUser && loginedUser.isAdmin) {
       inOperation = inOpe;
       updateStatusHandler();
     }
-  })
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Disconnect');
+    if (loginedUser) {
+      console.log('called');
+      users.removeUser(loginedUser);
+    }
+  });
 });
 
 const updateStatusHandler = () => {

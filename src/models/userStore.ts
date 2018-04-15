@@ -10,10 +10,18 @@ export default class UserStore {
   addUser(user: User): boolean {
     if (!this.isAlreadyExist(user)) {
       this.users.push(user);
+      console.log(this.users);
       return true;
     } else {
       return false;
     }
+  }
+
+  removeUser(user: User) {
+    this.users = this.users.filter((u: User) => {
+      return user.socketId !== u.socketId;
+    });
+    console.log(this.users);
   }
 
   getUserBySocketId(socketId: string): User|null {
